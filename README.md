@@ -123,4 +123,14 @@ sh: eit: not found
 command terminated with exit code 127
 ```
 
+### delete pod 
+
+```
+ kubectl delete pod  ashupod-1
+pod "ashupod-1" deleted
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl get  po 
+NAME          READY   STATUS    RESTARTS   AGE
+binapod-1     1/1     Running   0          8m39s
+```
+
 
