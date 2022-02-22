@@ -214,4 +214,101 @@ lo        Link encap:Local Loopback
   250  docker images
   251  docker run -itd --network ashubr9 --ip 192.168.1.202 phx.ocir.io/axmbtg8judkl/javawebapp:v1
 ```
+### Container restart policy 
+
+<img src="res.png">
+
+### restart policy 
+[restart policy](https://docs.docker.com/config/containers/start-containers-automatically/)
+
+### format json 
+
+```
+ docker  inspect  cc11  --format='{{.Id}}'
+7a850bcf7106bb263532c5c0e90570d65d77c1e78eac8944c7ece355a1327d45
+[ashu@ip-172-31-95-240 java-springboot]$ docker  inspect  cc11  --format='{{.State.Status}}'
+running
+[ashu@ip-172-31-95-240 java-springboot]$ docker  inspect  cc11  --format='{{.HostConfig.RestartPolicy.Name}}'
+no
+
+```
+
+### restart policy 
+
+```
+docker  run -itd --name cc22 --restart  always  alpine 
+82a3e3b47cf20f49b84355aa080d8ecbfe03a1d67d281038b6e51ef7f0410b6d
+[ashu@ip-172-31-95-240 java-springboot]$ 
+[ashu@ip-172-31-95-240 java-springboot]$ 
+[ashu@ip-172-31-95-240 java-springboot]$ docker  inspect  cc22  --format='{{.HostConfig.RestartPolicy.Name}}'
+always
+[ashu@ip-172-31-95-240 java-springboot]$ 
+
+```
+
+### Container storage 
+
+<img src="st.png">
+
+### storage team will do that --
+
+```
+# lsblk 
+NAME          MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+nvme0n1       259:0    0  100G  0 disk 
+|-nvme0n1p1   259:1    0  100G  0 part /
+`-nvme0n1p128 259:2    0    1M  0 part 
+nvme1n1       259:3    0  200G  0 disk 
+[root@ip-172-31-95-240 ~]# 
+[root@ip-172-31-95-240 ~]# mkfs.xfs   /dev/nvme1n1   
+meta-data=/dev/nvme1n1           isize=512    agcount=16, agsize=3276800 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=0
+data     =                       bsize=4096   blocks=52428800, imaxpct=25
+         =                       sunit=1      swidth=1 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal log           bsize=4096   blocks=25600, version=2
+         =                       sectsz=512   sunit=1 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+[root@ip-172-31-95-240 ~]# mkdir  /oracleDe 
+[root@ip-172-31-95-240 ~]# mount  /dev/nvme1n1   /oracleDe/
+
+```
+### configure docker engine storage
+
+```
+  56  mkfs.xfs   /dev/nvme1n1   
+   57  mkdir  /oracleDe 
+   58  mount  /dev/nvme1n1   /oracleDe/
+   59  vim /etc/sysconfig/docker
+   60  systemctl daemon-reload 
+   61  systemctl  restart  docker 
+   62  cd /var/lib/docker/
+   63  ls
+   64  cd
+   65  rsync -avp  /var/lib/docker/  /oracleDe/
+   66  history 
+[root@ip-172-31-95-240 ~]# systemctl restart  docker 
+
+```
+
+### config file 
+
+```
+ cat  /etc/sysconfig/docker
+# The max number of open files for the daemon itself, and all
+# running containers.  The default value of 1048576 mirrors the value
+# used by the systemd service unit.
+DAEMON_MAXFILES=1048576
+
+# Additional startup options for the Docker daemon, for example:
+# OPTIONS="--ip-forward=true --iptables=true"
+# By default we limit the number of open files per container
+OPTIONS="--default-ulimit nofile=32768:65536 -g /oracleDe/"
+
+```
+
+### container storge 
+
+<img src="contst.png">
 
