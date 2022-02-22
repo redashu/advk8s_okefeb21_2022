@@ -312,3 +312,143 @@ OPTIONS="--default-ulimit nofile=32768:65536 -g /oracleDe/"
 
 <img src="contst.png">
 
+### creating volume 
+
+```
+ docker  volume  create   ashudb-vol 
+ashudb-vol
+[ashu@ip-172-31-95-240 images]$ docker  volume ls
+DRIVER    VOLUME NAME
+local     556afc63af6d58c7a9c0a851f303ca433ef7a24aa9821e27455b065dab4f4bfb
+local     ashudb-vol
+local     binadb_vol
+
+```
+
+### db container and update restart policy 
+
+```
+ 215  docker  run -itd  --name ashudb -e MYSQL_ROOT_PASSWORD=Oracle098  -v  ashudb-vol:/var/lib/docker:rw     mysql  
+  216  history 
+[ashu@ip-172-31-95-240 images]$ docker  ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED             STATUS             PORTS                 NAMES
+5b7dd4e9175a   mysql     "docker-entrypoint.s…"   11 seconds ago      Up 9 seconds       3306/tcp, 33060/tcp   ashudb
+82a3e3b47cf2   alpine    "/bin/sh"                About an hour ago   Up About an hour                         cc22
+[ashu@ip-172-31-95-240 images]$ 
+[ashu@ip-172-31-95-240 images]$ 
+[ashu@ip-172-31-95-240 images]$ docker  update   ashudb  --restart  always 
+ashudb
+[ashu@ip-172-31-95-240 images]$ 
+
+```
+
+### access db 
+
+```
+$ docker  exec -it  ashudb bash 
+root@d9a44297a603:/# 
+root@d9a44297a603:/# mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 8.0.28 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+
+```
+
+### backend of docker volume 
+
+```
+cd  /oracleDe/
+[root@ip-172-31-95-240 oracleDe]# ls
+buildkit  containers  image  network  overlay2  plugins  runtimes  swarm  tmp  trust  volumes
+[root@ip-172-31-95-240 oracleDe]# cd  volumes/
+[root@ip-172-31-95-240 volumes]# ls
+3322762f339e892f49fb2113cf89ad565b590430ad3a535ade02f0166b3ec3af
+556afc63af6d58c7a9c0a851f303ca433ef7a24aa9821e27455b065dab4f4bfb
+ashudb-vol
+backingFsBlockDev
+binadb_vol
+dineshdb-vol
+dkeshava-vol
+e8101a5bf9e64437fbf518c95793e4946221b75655ba3e85c0385f070fb2a689
+f682074b941d414d9cca4f990c70c83adacf93f2d2988f631c1cff1ccb1effde
+manish_vol
+metadata.db
+mohit-vol
+portainer_data
+[root@ip-172-31-95-240 volumes]# cd  ashudb-vol/
+[root@ip-172-31-95-240 ashudb-vol]# ls
+_data
+[root@ip-172-31-95-240 ashudb-vol]# cd _data/
+[root@ip-172-31-95-240 _data]# ls
+#ib_16384_0.dblwr  binlog.000001  ca.pem            ib_buffer_pool  ibtmp1     performance_schema  server-key.pem
+#ib_16384_1.dblwr  binlog.000002  client-cert.pem   ib_logfile0     mysql      private_key.pem     sys
+#innodb_temp       binlog.index   client-key.pem    ib_logfile1     mysql.ibd  public_key.pem      undo_001
+auto.cnf           ca-key.pem     d9a44297a603.err  ibdata1         oracle
+
+```
+
+### nfs based volume --
+
+```
+docker  volume  create ashunfs-vol  --driver local  --opt  type=nfs --opt  o=addr=172.31.3.108,rw --opt    device=:/data/ashu 
+
+
+====
+docker  volume  inspect  ashunfs-vol 
+[
+    {
+        "CreatedAt": "2022-02-22T09:01:01Z",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/oracleDe/volumes/ashunfs-vol/_data",
+        "Name": "ashunfs-vol",
+        "Options": {
+            "device": ":/data/ashu",
+            "o": "addr=172.31.3.108,rw",
+            "type": "nfs"
+        },
+        "Scope": "local"
+    }
+]
+
+```
+
+## remove volume 
+
+```
+ docker  run -tid  --name  ashuc11  -v  ashunfs-vol:/mnt/data:rw  alpine  
+9a062508893548d4d46437d833f57c16aea481f3f9622c6772bc50e20666211b
+[ashu@ip-172-31-95-240 images]$ 
+[ashu@ip-172-31-95-240 images]$ 
+[ashu@ip-172-31-95-240 images]$ 
+[ashu@ip-172-31-95-240 images]$ docker  exec  -it  ashuc11 sh 
+/ # cd  /mnt/
+/mnt # ls
+data
+/mnt # cd data/
+/mnt/data # ls
+/mnt/data # mkdir  hello world  this is remote data 
+/mnt/data # ls
+data    hello   is      remote  this    world
+/mnt/data # exit
+[ashu@ip-172-31-95-240 images]$ docker  exec  -it  ashuc11 sh 
+/ # ls /mnt/data/
+data    hello   hiii    is      remote  this    world
+/ # exit
+
+```
+
