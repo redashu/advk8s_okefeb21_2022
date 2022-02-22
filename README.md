@@ -117,3 +117,101 @@ v1: Pulling from axmbtg8judkl/javawebapp
 
 
 ```
+
+### Docker advanced bridge drivers 
+
+<img src="bridge.png">
+
+### remove all containers 
+
+```
+docker  rm $(docker  ps -aq)  -f
+1365d983516b
+ebea905d264e
+5b4e9f76dfe5
+```
+
+### checking static ip with container 
+
+```
+ docker  network  create  ashubr1
+dafd19e4f4faece91adefe12c4f5d3aef2490c9778a72c6cfe8d95d9670f0735
+[ashu@ip-172-31-95-240 java-springboot]$ docker  network  ls
+NETWORK ID     NAME      DRIVER    SCOPE
+dafd19e4f4fa   ashubr1   bridge    local
+acd6785f29b0   bridge    bridge    local
+5da5bf6c922c   host      host      local
+09ee78f30ca3   none      null      local
+[ashu@ip-172-31-95-240 java-springboot]$ 
+[ashu@ip-172-31-95-240 java-springboot]$ 
+[ashu@ip-172-31-95-240 java-springboot]$ docker  network  create  ashubr2  --subnet  192.168.10.0/24 
+cc7c867763ca1882b6cf84f568d9d7efc1b11b8f27ad639d230e28392d0d00c4
+[ashu@ip-172-31-95-240 java-springboot]$ docker  run -itd --name cc11 --network ashubr2 --ip  192.168.10.100  alpine 
+Unable to find image 'alpine:latest' locally
+latest: Pulling from library/alpine
+59bf1c3509f3: Pull complete 
+Digest: sha256:21a3deaa0d32a8057914f36584b5288d2e5ecc984380bc0118285c70fa8c9300
+Status: Downloaded newer image for alpine:latest
+7a850bcf7106bb263532c5c0e90570d65d77c1e78eac8944c7ece355a1327d45
+[ashu@ip-172-31-95-240 java-springboot]$ docker  exec -it cc11 ifconfig 
+eth0      Link encap:Ethernet  HWaddr 02:42:C0:A8:0A:64  
+          inet addr:192.168.10.100  Bcast:192.168.10.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:10 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:940 (940.0 B)  TX bytes:0 (0.0 B)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+[ashu@ip-172-31-95-240 java-springboot]$ docker  restart  cc11
+cc11
+[ashu@ip-172-31-95-240 java-springboot]$ docker kill cc11
+cc11
+[ashu@ip-172-31-95-240 java-springboot]$ docker start  cc11
+cc11
+[ashu@ip-172-31-95-240 java-springboot]$ docker  exec -it cc11 ifconfig 
+eth0      Link encap:Ethernet  HWaddr 02:42:C0:A8:0A:64  
+          inet addr:192.168.10.100  Bcast:192.168.10.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:7 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:650 (650.0 B)  TX bytes:0 (0.0 B)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+
+```
+
+### MacVLAN 
+
+<img src="macvlan.png">
+
+### demo 
+
+```
+242  docker  network  create  -d  macvlan  --subnet 192.168.1.0/24  --gateway 192.168.1.254 -o parent=ens33   
+  243  docker  network  create  ashubr9 -d  macvlan  --subnet 192.168.1.0/24  --gateway 192.168.1.254 -o parent=ens33   
+  244  history 
+  245  docker  network  ls
+  246  docker run -itd --name me  --network ashubr9  --ip  192.168.1.200 alpine 
+  247  docker  exec -it  me sh 
+  248  docker run -itd --network ashubr9  --ip  192.168.1.201  nginx 
+  249  docker ps
+  250  docker images
+  251  docker run -itd --network ashubr9 --ip 192.168.1.202 phx.ocir.io/axmbtg8judkl/javawebapp:v1
+```
+
