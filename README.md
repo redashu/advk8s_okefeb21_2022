@@ -167,3 +167,170 @@ Events:                   <none>
 
 ```
 
+### running pod yaml -- backup and restore 
+
+```
+ kubectl get po  binawebapp -o yaml  >/tmp/myyam.yaml
+fire@ashutoshhs-MacBook-Air ~ % vim /tmp/myyam.yaml 
+fire@ashutoshhs-MacBook-Air ~ % kubectl apply -f  /tmp/myyam.yaml 
+pod/ashuapp created
+fire@ashutoshhs-MacBook-Air ~ % kubectl get po 
+NAME            READY   STATUS             RESTARTS   AGE
+ashuapp         1/1     Running            0          6s
+binawebapp      1/1     Running            0          16m
+deeptiwebapp    0/1     ImagePullBackOff   0          12m
+deeptiwebapp1   0/1     ImagePullBackOff   0          11m
+deeptiwebapp2   1/1     Running            0          2m13s
+manishwebapp    1/1     Running            0          13m
+mohitwebapp     1/1     Running            0          4m19s
+fire@ashutoshhs-MacBook-Air ~ % kubectl get po --show-labels
+NAME            READY   STATUS             RESTARTS   AGE     LABELS
+ashuapp         1/1     Running            0          14s     OCR=binawebapp
+binawebapp      1/1     Running            0          16m     OCR=binawebapp
+
+```
+
+### deploy private image in K8s --
+
+### POD yaml --
+
+### Intro to secret resource 
+
+<img src="secret.png">
+
+### creating secret yaml 
+
+```
+ kubectl  create  secret  
+Create a secret using specified subcommand.
+
+Available Commands:
+  docker-registry Create a secret for use with a Docker registry
+  generic         Create a secret from a local file, directory, or literal value
+  tls             Create a TLS secret
+
+
+
+```
+
+### 
+
+```
+kubectl  create  secret  docker-registry  ashusec  --docker-server  phx.ocir.io            --docker-username="axmbtg8judkl/learntechbyme@gmail.com"  --docker-password="N0.rs]98{3OXTuLQ0uDQ"  --dry-run=client       -o yaml  >ocrsec.yaml 
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl  apply -f ocrsec.yaml 
+secret/ashusec created
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl get  secret 
+NAME                  TYPE                                  DATA   AGE
+ashusec               kubernetes.io/dockerconfigjson        1      6s
+default-token-4phqc   kubernetes.io/service-account-token   3      21h
+
+```
+
+### using secret 
+
+<img src="usesec.png">
+
+### creating service using expose 
+
+```
+ kubectl get po --show-labels 
+NAME           READY   STATUS    RESTARTS   AGE     LABELS
+ashuocrapp     1/1     Running   0          4m55s   run=ashuocrapp
+binaocrapp     1/1     Running   0          116s    run=ashuocrapp
+deeptiocrapp   1/1     Running   0          15m     run=deeptiocrapp
+dineshocrapp   1/1     Running   0          2m26s   run=dineshocrapp
+dineshwebapp   1/1     Running   0          16m     ocr=dineshassgnsvc1
+manishocrapp   1/1     Running   0          4m31s   run=manishocrapp
+mohitocrapp    1/1     Running   0          15m     run=mohitocrapp
+fire@ashutoshhs-MacBook-Air ~ % kubectl expose  pod   ashuocrapp  --type NodePort --port 1234 --target-port 80 --name ashusvc1  
+service/ashusvc1 exposed
+fire@ashutoshhs-MacBook-Air ~ % kubectl get  svc
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+ashusvc1     NodePort    10.103.189.68   <none>        1234:30902/TCP   4s
+kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP          22m
+fire@ashutoshhs-MacBook-Air ~ % kubectl get  svc -o wide
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE   SELECTOR
+ashusvc1     NodePort    10.103.189.68   <none>        1234:30902/TCP   10s   run=ashuocrapp
+
+```
+
+### k8s namespaces concept 
+
+<img src="ns.png">
+
+### creating namespace 
+
+```
+kubectl create  namespace  ashu-project                           
+namespace/ashu-project created
+fire@ashutoshhs-MacBook-Air ~ % kubectl get  namespaces
+NAME              STATUS   AGE
+ashu-project      Active   10s
+default           Active   22h
+kube-node-lease   Active   22h
+kube-public       Active   22h
+kube-system       Active   22h
+
+```
+
+### changing default namespace 
+
+```
+$ kubectl get  po
+No resources found in default namespace.
+[ashu@ip-172-31-95-240 k8sapps]$ 
+[ashu@ip-172-31-95-240 k8sapps]$ 
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl config set-context  --current --namespace=ashu-project
+Context "kubernetes-admin@kubernetes" modified.
+[ashu@ip-172-31-95-240 k8sapps]$ 
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl get  pods
+No resources found in ashu-project namespace.
+
+```
+
+##
+
+```
+kubectl  config get-contexts 
+CURRENT   NAME                          CLUSTER      AUTHINFO           NAMESPACE
+*         kubernetes-admin@kubernetes   kubernetes   kubernetes-admin   ashu-project
+[ashu@ip-172-31-95-240 k8sapps]$ 
+
+```
+
+### deploy yamls in custom namespace 
+
+```
+ ls
+ocrsec.yaml  ocrwebapp.yaml  pod1.yaml  websvc.yaml  web.yaml
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl  config get-contexts 
+CURRENT   NAME                          CLUSTER      AUTHINFO           NAMESPACE
+*         kubernetes-admin@kubernetes   kubernetes   kubernetes-admin   ashu-project
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl apply -f . 
+secret/ashusec created
+pod/ashuocrapp created
+pod/ashupod-1 created
+pod/ashuwebapp created
+service/ashusvc1 created
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl get  po,svc
+NAME             READY   STATUS    RESTARTS   AGE
+pod/ashuocrapp   1/1     Running   0          18s
+pod/ashupod-1    1/1     Running   0          18s
+pod/ashuwebapp   1/1     Running   0          18s
+
+NAME               TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service/ashusvc1   NodePort   10.105.46.134   <none>        1234:30195/TCP   18s
+```
+
+### checking pods 
+
+```
+kubectl get  po  -n  bina-project
+NAME         READY   STATUS    RESTARTS   AGE
+binamypod1   1/1     Running   0          2m4s
+binaocrapp   1/1     Running   0          2m4s
+binapod-1    1/1     Running   0          2m4s
+binawebapp   1/1     Running   0          2m4s
+
+```
+
