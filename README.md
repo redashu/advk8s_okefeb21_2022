@@ -49,3 +49,23 @@ IPs:
   IP:  192.168.60.194
 ```
 
+## Container networking 
+
+<img src="cnet.png">
+
+### CNI bridge
+
+<img src="cnii.png">
+
+###  Intro to Internal LB 
+
+<img src="lb.png">
+
+### Service intro 
+
+<img src="svc.png">
+
+## Nodeport service 
+
+<img src="np.png">
+
