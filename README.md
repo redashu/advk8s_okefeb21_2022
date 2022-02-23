@@ -484,6 +484,63 @@ fire@ashutoshhs-MacBook-Air ~ % kubectl  rollout status deploy ashudep1
 deployment "ashudep1" successfully rolled out
 ```
 
+### scaling of POds 
+
+<img src="scalepod.png">
+
+## HPA --
+
+<img src="hpa.png">
+
+### deploy metric server 
+
+```
+ kubectl apply -f https://raw.githubusercontent.com/redashu/k8s/hpa/hpa/components.yaml
+serviceaccount/metrics-server created
+clusterrole.rbac.authorization.k8s.io/system:aggregated-metrics-reader created
+clusterrole.rbac.authorization.k8s.io/system:metrics-server created
+rolebinding.rbac.authorization.k8s.io/metrics-server-auth-reader created
+clusterrolebinding.rbac.authorization.k8s.io/metrics-server:system:auth-delegator created
+clusterrolebinding.rbac.authorization.k8s.io/system:metrics-server created
+service/metrics-server created
+deployment.apps/metrics-server created
+apiservice.apiregistration.k8s.io/v1beta1.metrics.k8s.io created
+fire@ashutoshhs-MacBook-Air ~ % kubectl get po -n kube-system                                                         
+NAME                                       READY   STATUS    RESTARTS     AGE
+calico-kube-controllers-566dc76669-84mjr   1/1     Running   1 (8h ago)   25h
+calico-node-q5t7c                          1/1     Running   1 (8h ago)   25h
+calico-node-tss78                          1/1     Running   0            8h
+calico-node-vqnbm                          1/1     Running   1 (8h ago)   25h
+coredns-64897985d-9mxc8                    1/1     Running   1 (8h ago)   25h
+coredns-64897985d-wtkkk                    1/1     Running   1 (8h ago)   25h
+etcd-control-plane                         1/1     Running   1 (8h ago)   25h
+kube-apiserver-control-plane               1/1     Running   1 (8h ago)   25h
+kube-controller-manager-control-plane      1/1     Running   1 (8h ago)   25h
+kube-proxy-28z7b                           1/1     Running   1 (8h ago)   25h
+kube-proxy-5cpnb                           1/1     Running   0            8h
+kube-proxy-r2zrp                           1/1     Running   1 (8h ago)   25h
+kube-scheduler-control-plane               1/1     Running   1 (8h ago)   25h
+metrics-server-5c69db44f5-zjx2b            1/1     Running   0            8s
+
+```
+
+### hpa 
+
+```
+kubectl autoscale deployment  ashudep1  --min=3 --max=20 --cpu-percent=85                   
+horizontalpodautoscaler.autoscaling/ashudep1 autoscaled
+fire@ashutoshhs-MacBook-Air ~ % kubectl get  hpa
+NAME       REFERENCE             TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+ashudep1   Deployment/ashudep1   <unknown>/85%   3         20        0          9s
+fire@ashutoshhs-MacBook-Air ~ % kubectl get  hpa
+NAME       REFERENCE             TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+ashudep1   Deployment/ashudep1   <unknown>/85%   3         20        1          27s
+fire@ashutoshhs-MacBook-Air ~ % kubectl get  hpa
+NAME       REFERENCE             TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+ashudep1   Deployment/ashudep1   0%/85%    3         20        3          48s
+
+```
+
 
 
 
