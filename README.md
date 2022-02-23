@@ -334,3 +334,123 @@ binawebapp   1/1     Running   0          2m4s
 
 ```
 
+### Delete all resources under current namespace 
+
+```
+kubectl config get-contexts
+CURRENT   NAME                          CLUSTER      AUTHINFO           NAMESPACE
+*         kubernetes-admin@kubernetes   kubernetes   kubernetes-admin   ashu-project
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl  get  all
+NAME             READY   STATUS    RESTARTS   AGE
+pod/ashuocrapp   1/1     Running   0          73m
+pod/ashupod-1    1/1     Running   0          73m
+pod/ashuwebapp   1/1     Running   0          73m
+
+NAME               TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service/ashusvc1   NodePort   10.105.46.134   <none>        1234:30195/TCP   73m
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl delete all --all
+pod "ashuocrapp" deleted
+pod "ashupod-1" deleted
+pod "ashuwebapp" deleted
+service "ashusvc1" deleted
+
+```
+
+### kube-system -- namespace
+
+```
+ kubectl get po -n kube-system
+NAME                                       READY   STATUS    RESTARTS        AGE
+calico-kube-controllers-566dc76669-84mjr   1/1     Running   1 (5h52m ago)   23h
+calico-node-q5t7c                          1/1     Running   1 (5h52m ago)   23h
+calico-node-tss78                          1/1     Running   0               5h53m
+calico-node-vqnbm                          1/1     Running   1 (5h52m ago)   23h
+coredns-64897985d-9mxc8                    1/1     Running   1 (5h52m ago)   23h
+coredns-64897985d-wtkkk                    1/1     Running   1 (5h52m ago)   23h
+etcd-control-plane                         1/1     Running   1 (5h52m ago)   23h
+
+```
+
+### Intro to deployment 
+
+<img src="dep.png">
+
+### create deployment and scaling 
+
+```
+kubectl create  deployment  ashudep1  --image=docker.io/dockerashu/oracleweb:appv2  --port 80  --dry-run=client -o yaml >deploy.yaml
+```
+
+### deploy pod yaml --
+
+```
+kubectl apply -f  deploy.yaml 
+deployment.apps/ashudep1 created
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl get deployments
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+ashudep1   1/1     1            1           6s
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl get deploy
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+ashudep1   1/1     1            1           10s
+
+```
+
+### self healing 
+
+```
+$ kubectl apply -f  deploy.yaml 
+deployment.apps/ashudep1 created
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl get deployments
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+ashudep1   1/1     1            1           6s
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl get deploy
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+ashudep1   1/1     1            1           10s
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl get  po
+NAME                        READY   STATUS    RESTARTS   AGE
+ashudep1-68d478fd66-jswnb   1/1     Running   0          3m1s
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl delete po  ashudep1-68d478fd66-jswnb
+pod "ashudep1-68d478fd66-jswnb" deleted
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl get  po
+NAME                        READY   STATUS    RESTARTS   AGE
+ashudep1-68d478fd66-vcck9   1/1     Running   0          10s
+[ashu@ip-172-31-95-240 k8sapps]$ 
+```
+
+### manual scaling --
+
+```
+kubectl scale  deploy   ashudep1  --replicas=5 
+deployment.apps/ashudep1 scaled
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl  get deploy 
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+ashudep1   3/5     5            3           11m
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl  get deploy 
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+ashudep1   5/5     5            5           11m
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl  get  po --show-labels 
+NAME                        READY   STATUS    RESTARTS   AGE     LABELS
+ashudep1-68d478fd66-5h78h   1/1     Running   0          19s     app=ashudep1,pod-template-hash=68d478fd66
+ashudep1-68d478fd66-cl6j8   1/1     Running   0          19s     app=ashudep1,pod-template-hash=68d478fd66
+ashudep1-68d478fd66-m4gzk   1/1     Running   0          19s     app=ashudep1,pod-template-hash=68d478fd66
+ashudep1-68d478fd66-nj2zk   1/1     Running   0          91s     app=ashudep1,pod-template-hash=68d478fd66
+ashudep1-68d478fd66-vcck9   1/1     Running   0          7m20s   app=ashudep1,pod-template-hash=68d478fd66
+```
+
+### expose deployment to create svc 
+
+```
+kubectl  get  deploy 
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+ashudep1   5/5     5            5           12m
+[ashu@ip-172-31-95-240 k8sapps]$ 
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl expose deployment  ashudep1  --type NodePort --port 1234 --target-port 80  --name ashusvc2 
+service/ashusvc2 exposed
+[ashu@ip-172-31-95-240 k8sapps]$ 
+[ashu@ip-172-31-95-240 k8sapps]$ 
+[ashu@ip-172-31-95-240 k8sapps]$ kubectl get svc
+NAME       TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+ashusvc2   NodePort   10.102.32.53   <none>        1234:32303/TCP   5s
+
+```
+
