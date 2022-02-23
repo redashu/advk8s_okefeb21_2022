@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashusvc1
+  name: ashusvc1 # name of service 
+spec:
+  ports:
+  - name: 1234-80
+    port: 1234 # service Port number 
+    protocol: TCP
+    targetPort: 80 # app port where service will forward request 
+  selector: # pod finder using label of pod 
+    x: helloashuapp # label of my app pods 
+  type: NodePort # type of service 
+status:
+  loadBalancer: {}

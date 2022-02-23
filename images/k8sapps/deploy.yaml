@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashudep1
+  name: ashudep1 # name of deployment 
+  namespace: ashu-project # namespace info namespace must exist
+spec:
+  replicas: 1 # number of pods 
+  selector:
+    matchLabels:
+      app: ashudep1
+  strategy: {}
+  template: # deploy will be using template to create number of pods 
+    metadata:
+      creationTimestamp: null
+      labels: # all the pods will have same label as given below 
+        app: ashudep1
+    spec:
+      containers:
+      - image: docker.io/dockerashu/oracleweb:appv2
+        name: oracleweb
+        ports:
+        - containerPort: 80
+        resources: # setting limits in pod resources 
+         requests:
+          memory: 200Mi  # 1MiB == 1000Kib 1Gib == 1000Mib 
+          cpu: 100m # 1 vcpu = 1000m -- mili core 
+         limits:
+          memory: 600Mi
+          cpu: 400m 
+status: {}
