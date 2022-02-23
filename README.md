@@ -454,3 +454,36 @@ ashusvc2   NodePort   10.102.32.53   <none>        1234:32303/TCP   5s
 
 ```
 
+### app upgradation 
+
+<img src="app.png">
+
+### update app 
+
+```
+ 1089  kubectl  set  image deployment  ashudep1  oracleweb=docker.io/dockerashu/oracleweb:appv3
+ 1090  kubectl describe deploy ashudep1 
+ 1091  kubectl  get  po
+fire@ashutoshhs-MacBook-Air ~ % 
+fire@ashutoshhs-MacBook-Air ~ % 
+fire@ashutoshhs-MacBook-Air ~ % kubectl  rollout history deploy ashudep1
+deployment.apps/ashudep1 
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+
+
+```
+
+### rollback to 
+
+```
+ kubectl  rollout undo  deploy ashudep1
+deployment.apps/ashudep1 rolled back
+fire@ashutoshhs-MacBook-Air ~ % kubectl  rollout status deploy ashudep1
+deployment "ashudep1" successfully rolled out
+```
+
+
+
+
