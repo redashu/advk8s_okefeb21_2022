@@ -188,3 +188,56 @@ clusterrolebinding.rbac.authorization.k8s.io/dashboardaccess created
 kubectl create  deployment testcase1 --image=dockerashu/liveness:appv1    --port 80  --dry-run=client  -o yaml >health.yaml
 
 ```
+
+## Storage in k8s 
+
+<img src="st.png">
+
+### k8s volumes --
+
+<img src="vol.png">
+
+### EmptyDir volume to take storage from minion node -- at some random location 
+
+```
+kubectl exec -it ashudep4-78fc65b85f-ggv8q  -- sh 
+/ # cd  /mnt/
+/mnt # ls
+oracle
+/mnt # cd  oracle/
+/mnt/oracle # ls
+time.txt
+/mnt/oracle # ls -l time.txt 
+-rw-r--r--    1 root     root           174 Feb 24 09:24 time.txt
+/mnt/oracle # cat  time.txt 
+Thu Feb 24 09:22:53 UTC 2022
+Thu Feb 24 09:23:08 UTC 2022
+Thu Feb 24 09:23:23 UTC 2022
+Thu Feb 24 09:23:38 UTC 2022
+Thu Feb 24 09:23:53 UTC 2022
+Thu Feb 24 09:24:08 UTC 2022
+/mnt/oracle # cat  time.txt 
+Thu Feb 24 09:22:53 UTC 2022
+Thu Feb 24 09:23:08 UTC 2022
+Thu Feb 24 09:23:23 UTC 2022
+Thu Feb 24 09:23:38 UTC 2022
+Thu Feb 24 09:23:53 UTC 2022
+Thu Feb 24 09:24:08 UTC 2022
+Thu Feb 24 09:24:23 UTC 2022
+Thu Feb 24 09:24:38 UTC 2022
+/mnt/oracle # exit
+
+
+```
+
+### Multi container Pod Design
+
+<img src="multi.png">
+### sidecar container pattern 
+
+<img src="sidecar.png">
+
+
+
+
+
