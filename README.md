@@ -284,9 +284,36 @@ NAME   TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
 x1     NodePort   10.110.250.111   <none>        80:31458/TCP   5s
 fire@ashutoshhs-MacBook-Air ~ % 
 
+```
 
+### PV and PVC 
+
+<img src="pv.png">
+
+### deploy--
 
 ```
+ kubectl get deploy 
+NAME     READY   UP-TO-DATE   AVAILABLE   AGE
+ashudb   1/1     1            1           10s
+fire@ashutoshhs-MacBook-Air ~ % kubectl get  secret
+NAME                  TYPE                                  DATA   AGE
+ashudbpass            Opaque                                1      4m9s
+ashusec               kubernetes.io/dockerconfigjson        1      27h
+default-token-mbhrj   kubernetes.io/service-account-token   3      27h
+fire@ashutoshhs-MacBook-Air ~ % kubectl get  pvc   
+NAME         STATUS   VOLUME     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+ashu-claim   Bound    mohit-pv   1Gi        RWO                           20m
+fire@ashutoshhs-MacBook-Air ~ % kubectl get  po 
+NAME                      READY   STATUS    RESTARTS   AGE
+ashudb-7d87944bfb-rwvxj   1/1     Running   0          25s
+fire@ashutoshhs-MacBook-Air ~ % kubectl logs -f  ashudb-7d87944bfb-rwvxj
+2022-02-24 11:32:10+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.28-1debian10 started.
+2022-02-24 11:32:10+00:00 [Note] [Entrypoint]: Switching to dedicated u
+
+```
+
+
 
 
 
