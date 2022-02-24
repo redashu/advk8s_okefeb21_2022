@@ -237,6 +237,56 @@ Thu Feb 24 09:24:38 UTC 2022
 
 <img src="sidecar.png">
 
+### access containers in multi container pod 
+
+```
+ kubectl get  po    
+NAME                       READY   STATUS    RESTARTS   AGE
+ashudep4-bbc6b9984-lwsp5   2/2     Running   0          37s
+fire@ashutoshhs-MacBook-Air ~ % kubectl  exec  -it  ashudep4-bbc6b9984-lwsp5  -- bash 
+Defaulted container "sidecar" out of: sidecar, datagenerator
+root@ashudep4-bbc6b9984-lwsp5:/# 
+root@ashudep4-bbc6b9984-lwsp5:/# cd /usr/share/nginx/html/
+root@ashudep4-bbc6b9984-lwsp5:/usr/share/nginx/html# ls
+time.txt
+root@ashudep4-bbc6b9984-lwsp5:/usr/share/nginx/html# 
+exit
+fire@ashutoshhs-MacBook-Air ~ % kubectl  exec  -it  ashudep4-bbc6b9984-lwsp5  -- bash 
+Defaulted container "sidecar" out of: sidecar, datagenerator
+root@ashudep4-bbc6b9984-lwsp5:/# cd /usr/share/nginx/html/
+root@ashudep4-bbc6b9984-lwsp5:/usr/share/nginx/html# ls
+time.txt
+root@ashudep4-bbc6b9984-lwsp5:/usr/share/nginx/html# rm time.txt 
+rm: cannot remove 'time.txt': Read-only file system
+root@ashudep4-bbc6b9984-lwsp5:/usr/share/nginx/html# exit
+exit
+command terminated with exit code 1
+fire@ashutoshhs-MacBook-Air ~ % kubectl  exec  -it  ashudep4-bbc6b9984-lwsp5 -c datagenerator -- sh   
+/ # cd  /mnt/oracle/
+/mnt/oracle # ls
+time.txt
+/mnt/oracle # exit
+
+
+```
+
+### creating service -
+
+```
+% 
+fire@ashutoshhs-MacBook-Air ~ % kubectl get deploy 
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+ashudep4   1/1     1            1           2m51s
+fire@ashutoshhs-MacBook-Air ~ % kubectl expose deploy ashudep4 --type NodePort --port 80 --name x1
+service/x1 exposed
+fire@ashutoshhs-MacBook-Air ~ % kubectl get svc
+NAME   TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+x1     NodePort   10.110.250.111   <none>        80:31458/TCP   5s
+fire@ashutoshhs-MacBook-Air ~ % 
+
+
+
+```
 
 
 
