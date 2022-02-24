@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashuapp
+  name: ashuapp # name of deployment 
+spec:
+  replicas: 1 # number of pods 
+  selector:
+    matchLabels:
+      app: ashuapp
+  strategy: {}
+  template: # template section 
+    metadata:
+      creationTimestamp: null
+      labels: # labels of pod 
+        app: ashuapp
+    spec:
+      containers:
+      - image: dockerashu/oracleapp:24thfeb2022
+        name: oracleapp
+        ports:
+        - containerPort: 80
+        env: # to create  / call env values 
+        - name: deploy # from docker image 
+          valueFrom:
+           configMapKeyRef:
+            name: ashuenv # name of configmap 
+            key: key1 # key of configmap 
+        resources: {}
+status: {}

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: testcase1
+  name: testcase1 # name of deployment 
+spec:
+  replicas: 1 # number of POD 
+  selector:
+    matchLabels:
+      app: testcase1
+  strategy: {}
+  template: # for pod creation 
+    metadata:
+      creationTimestamp: null
+      labels: # name of label for pods 
+        app: testcase1
+    spec:
+      containers:
+      - image: dockerashu/liveness:appv1 # docker image 
+        name: liveness # name of container 
+        ports:
+        - containerPort: 80
+        livenessProbe: # for check app to access traffic 
+         httpGet:
+          path: /health1.html 
+          port: 80 
+         initialDelaySeconds: 3 # wait for 3 second just after deployment 
+         periodSeconds: 5 # keep doing that in every 5 seconds 
+        resources: {}
+status: {}
