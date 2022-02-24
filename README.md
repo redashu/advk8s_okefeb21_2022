@@ -182,4 +182,9 @@ clusterrolebinding.rbac.authorization.k8s.io/dashboardaccess created
 
 ```
 
+### Liveness Probe Demo 
 
+```
+kubectl create  deployment testcase1 --image=dockerashu/liveness:appv1    --port 80  --dry-run=client  -o yaml >health.yaml
+
+```
