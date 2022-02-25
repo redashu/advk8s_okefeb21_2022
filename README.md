@@ -465,4 +465,14 @@ NAME                CLASS   HOSTS   ADDRESS   PORTS   AGE
 ashu-rule-ingress   nginx   *                 80      5s
 ```
 
+### understanding roles and clusterrole 
+
+<img src="role.png">
+
+### bind a service account to cluster role 
+
+```
+kubectl create clusterrolebinding  oraclebind  --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:kubernetes-dashboard
+```
+
 
