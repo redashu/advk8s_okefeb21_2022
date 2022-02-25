@@ -397,3 +397,72 @@ NAME    NAMESPACE       REVISION        UPDATED STATUS  CHART   APP VERSION
 No resources found in test-dashb namespace.
 ```
 
+## Ingress controller understanding --
+
+<img src="ingress.png">
+
+## Deploy ingress controller --nginx one on custom k8s self managed
+
+```
+ kubectl  apply -f https://raw.githubusercontent.com/redashu/k8s/ssl/nginx-ingress-controller.yaml
+ 1053  kubectl get  ns
+ 1054  kubectl get  all -n ingress-nginx
+ 1055  kubectl get  po  -n ingress-nginx
+ 1056  kubectl get  svc  -n ingress-nginx
+ 
+  kubectl get  svc  -n ingress-nginx
+NAME                                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
+ingress-nginx-controller             NodePort    10.101.70.129   <none>        80:30269/TCP,443:31226/TCP   8m2s
+```
+
+### Deploy nginx ingress controller on OKE 
+
+```
+
+409  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.1/deploy/static/provider/cloud/deploy.yaml
+  410  kubectl get ns
+  411  kubectl get po -n ingress-nginx 
+  412  kubectl get svc -n ingress-nginx 
+  413  kubectl get po -n ingress-nginx 
+  414  kubectl get svc -n ingress-nginx 
+  
+   kubectl get svc -n ingress-nginx 
+NAME                                 TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)                      AGE
+ingress-nginx-controller             LoadBalancer   10.96.255.47   129.153.81.124   80:30482/TCP,443:31434/TCP   116s
+ingress-nginx-controller-admission   ClusterIP      10.96.93.7     <none>           443/TCP                      117s
+```
+
+
+### ingress controller demo apps
+
+```
+ kubectl create  deploy  ashudep1  --image=nginx --port 80 
+deployment.apps/ashudep1 created
+[ashu@ip-172-31-95-240 ingress-demo]$ kubectl get  deploy 
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+ashudep1   1/1     1            1           5s
+[ashu@ip-172-31-95-240 ingress-demo]$ kubectl scale deploy ashudep1  --replicas=3
+deployment.apps/ashudep1 scaled
+[ashu@ip-172-31-95-240 ingress-demo]$ 
+[ashu@ip-172-31-95-240 ingress-demo]$ kubectl create  deploy  ashudep2  --image=httpd --port 80 
+deployment.apps/ashudep2 created
+[ashu@ip-172-31-95-240 ingress-demo]$ kubectl get  deploy 
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+ashudep1   3/3     3            3           46s
+ashudep2   1/1     1            1           10s
+[ashu@ip-172-31-95-240 ingress-demo]$ kubectl scale deploy ashudep2  --replicas=2
+deployment.apps/ashudep2 scaled
+
+```
+
+### rule of ingress
+
+```
+kubectl apply -f  rule1.yaml 
+ingress.networking.k8s.io/ashu-rule-ingress created
+[ashu@ip-172-31-95-240 ingress-demo]$ kubectl get  ingress
+NAME                CLASS   HOSTS   ADDRESS   PORTS   AGE
+ashu-rule-ingress   nginx   *                 80      5s
+```
+
+
