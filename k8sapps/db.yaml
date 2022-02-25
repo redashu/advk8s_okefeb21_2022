@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashudb
+  name: ashudb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashudb
+  strategy: {}
+  template: # is for creating POD -- 
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashudb
+    spec:
+      volumes: # creating volume from PVC 
+      - name: ashudbvol 
+        persistentVolumeClaim: # source of volume 
+         claimName: ashu-claim
+      containers:
+      - image: mysql
+        name: mysql
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: ashudbvol
+          mountPath: /var/lib/mysql/ # default db location 
+        env: 
+        - name: MYSQL_ROOT_PASSWORD # env variable to set mysql db root password
+          valueFrom: # calling password from secret 
+           secretKeyRef:
+            name: ashudbpass # name of secret 
+            key: sqlpass # key 
+        resources: {}
+status: {}

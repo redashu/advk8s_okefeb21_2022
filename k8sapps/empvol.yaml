@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashudep4
+  name: ashudep4 # name of deployment 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashudep4
+  strategy: {}
+  template: # to create POD 
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashudep4
+    spec:
+      volumes: # to create volume from some sources 
+      - name: ashuvol1
+        emptyDir: {} # k8s -- kubelet will choose a random location in minion node
+      containers:
+      - image: alpine
+        name: alpine
+        volumeMounts: # to mount the volume created above
+        - name: ashuvol1 
+          mountPath: /mnt/oracle/ # this location will be created inside container
+        command: ["sh","-c","while true;do date >>/mnt/oracle/time.txt;sleep 15;done"]
+        resources: {}
+status: {}
