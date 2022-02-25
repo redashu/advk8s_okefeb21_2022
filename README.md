@@ -97,5 +97,116 @@ secret/ashudbsec configured
 persistentvolume/ashu-pv unchanged
 persistentvolumeclaim/ashu-claim unchanged
 ```
+### creating service for DB --
+
+```
+ kubectl get deploy 
+NAME     READY   UP-TO-DATE   AVAILABLE   AGE
+ashudb   1/1     1            1           26m
+fire@ashutoshhs-MacBook-Air ~ % kubectl expose deploy  ashudb  --type ClusterIP  --port 3306  --dry-run=client -o yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashudb
+  name: ashudb
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: ashudb
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+```
+
+
+### service name based communication -- with CoreDNS concept 
+
+```
+fire@ashutoshhs-MacBook-Air ~ % kubectl exec -it testpod1 -- sh       
+/ # nslookup ashudb 
+Server:		10.96.0.10
+Address:	10.96.0.10:53
+
+Name:	ashudb.ashu-project.svc.cluster.local
+Address: 10.104.109.68
+
+```
+
+### CoreDNS understanding 
+
+<img src="coredns.png">
+
+### Create webapp which is having html / css /js as FRONTend -- and PHP as backend 
+
+```
+ kubectl create  deployment ashu-webapp  --image=wordpress:4.8-apache --port 80 --dry-run=client  -o yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashu-webapp
+  name: ashu-webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashu-webapp
+  strategy: {}
+  template:
+    metadata:
+
+```
+
+### deploy after changes 
+
+```
+ kubectl get deploy 
+NAME          READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-webapp   1/1     1            1           23s
+ashudb        1/1     1            1           52m
+fire@ashutoshhs-MacBook-Air ~ % kubectl get  po    
+NAME                           READY   STATUS    RESTARTS   AGE
+ashu-webapp-57b544d6d7-xdzhm   1/1     Running   0          31s
+ashudb-67ccd95494-h7l9g        1/1     Running   0          53m
+testpod1                       1/1     Running   0          17m
+
+```
+
+### creating service for webapp of NodePort type 
+
+```
+ kubectl  get deploy 
+NAME          READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-webapp   1/1     1            1           13m
+ashudb        1/1     1            1           65m
+fire@ashutoshhs-MacBook-Air ~ % kubectl expose deploy  ashu-webapp  --type NodePort --port 80 --name websvc --dry-run=client  -o yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashu-webapp
+  name: websvc
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ashu-webapp
+  type: NodePort
+status:
+  loadBalancer: {}
+
+```
+
+
 
 
